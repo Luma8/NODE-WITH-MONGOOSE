@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const MissionControler = require('../controlers/MissionControler');
 
 app.get('/', (req, res) => {
     res.send('hello')
@@ -13,19 +14,39 @@ app.use(express.json());
 
 //modules
 const User = require('../models/User');
+const Missions = require('../models/MissionsModel');
+//midleware
+const checkToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]//separate bearer
+
+    if (!token) {
+        return res.status(401).json({ msg: 'not have a user Token' })
+    }
+
+    try {
+
+        const secret = process.env.SECRET;
+        jwt.verify(token, secret);
+        next();
+
+    } catch (error) {
+        res.status(400).json({ msg: 'invalided token' })
+    }
+}
 
 // private Route
-app.get('/user/:id', async (req, res) => {
+app.get('/user/:id', checkToken, async (req, res) => {
     const id = req.params.id;
 
     // check if user exist
     const user = await User.findById(id, '-password')
 
-    if(!user) {
+    if (!user) {
         return res.status(404).json({ msg: 'User not found' })
     }
-
     res.status(202).json({ user });
+
 })
 
 //login
@@ -69,6 +90,13 @@ app.post('/auth/user', async (req, res) => {
         res.status(500).json({ msg: 'Error in try' })
     }
 })
+
+//mission Routes
+app.post('/missions', MissionControler.store);
+app.get('/missions', MissionControler.index);
+app.get('/missions/:id', MissionControler.show);
+app.put('/missions/:id', MissionControler.update);
+app.delete('/missions/:id', MissionControler.destroy);
 
 //Register
 app.post('/register', async (req, res) => {
