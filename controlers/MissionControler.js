@@ -1,5 +1,5 @@
 const MissionsModel = require('../models/MissionsModel');
-
+const UserModel = require('../models/UserModel');
 class MissionControler {
     async store(req, res) {
         const { title, description, check } = req.body;
@@ -16,6 +16,46 @@ class MissionControler {
 
         const createMission = await MissionsModel.create(req.body);
         return res.status(200).json(createMission);
+    }
+    async userPost(req, res) {
+        const userId = req.params.id;
+        let { id_user, title, description, check } = req.body;
+        id_user = userId;
+
+        console.log(id_user);
+
+        try {
+            if (!title) {
+                return res.status(422).json({ msg: 'required title Input' })
+            }
+            if (!description) {
+                return res.status(422).json({ msg: 'required description Input' })
+            }
+            if (!check) {
+                return res.status(422).json({ msg: 'required Check Input' })
+            }
+
+            const createMission = await MissionsModel.create(req.body);
+            console.log(req.body);
+            return res.status(200).json(createMission);
+
+        } catch (err) {
+            console.log(err);
+            return res.status(404).json({ msg: 'erro' })
+        }
+    }
+    async userGet(req, res) {
+        const userId = req.params.id;
+        const user = await UserModel.findById(userId, '-password')
+        const Mission = await MissionsModel.find()
+
+        try {
+            console.log(Mission);
+            return res.status(200).json({ Mission })
+        } catch (err) {
+            console.log(err);
+            return res.status(404).json({ msg: 'erro' })
+        }
     }
     async index(req, res) {
         const Missions = await MissionsModel.find();
