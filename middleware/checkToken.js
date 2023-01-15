@@ -13,7 +13,7 @@ const checkToken = (req, res, next) => {
 
         const secret = process.env.SECRET;
         jwt.verify(token, secret);
-        next();
+        // next();
 
     } catch (error) {
         res.status(400).json({ msg: 'invalided token' })

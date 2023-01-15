@@ -88,13 +88,14 @@ class UserControler {
             res.status(500).json({ msg: 'Error in try' })
         }
     }
+    //Search User with Id
     async showuser(req, res) {
         try {
             const id = req.params.id;
 
-            // check if user exist
             const user = await UserModel.findById(id, '-password')
-
+            
+            // check if user exist
             if (!user) {
                 return res.status(404).json({ msg: 'User not found' })
             }
