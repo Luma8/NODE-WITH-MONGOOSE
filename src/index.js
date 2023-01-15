@@ -4,7 +4,8 @@ const app = express();
 const mongoose = require('mongoose');
 const UserControler = require('../controlers/UserControler');
 const MissionControler = require('../controlers/MissionControler');
-const checkToken = require('../middleware/checkToken');
+const ImageControler = require('../controlers/ImageControler');
+// const checkToken = require('../middleware/checkToken');
 
 app.use(express.json());
 
@@ -41,3 +42,13 @@ app.post('/register', UserControler.register);
 app.post('/auth/user', UserControler.login);
 
 app.get('/user/:id', UserControler.showuser);
+
+// Image Route
+
+app.get('/Images', ImageControler.index);
+
+app.get('/Images/:id', ImageControler.show);
+
+app.patch('/Images/:id', ImageControler.update);
+
+app.post('/uploading', ImageControler.store);

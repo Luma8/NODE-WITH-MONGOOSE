@@ -1,5 +1,4 @@
 const MissionsModel = require('../models/MissionsModel');
-const UserModel = require('../models/UserModel');
 class MissionControler {
     async store(req, res) {
         const { title, description, check } = req.body;
@@ -19,10 +18,7 @@ class MissionControler {
     }
     async userPost(req, res) {
         const userId = req.params.id;
-        let { id_user, title, description, check } = req.body;
-        id_user = userId;
-
-        console.log(id_user);
+        const { title, description, check } = req.body;
 
         try {
             if (!title) {
@@ -35,7 +31,7 @@ class MissionControler {
                 return res.status(422).json({ msg: 'required Check Input' })
             }
 
-            const createMission = await MissionsModel.create(req.body);
+            const createMission = await MissionsModel.create({ title: title, description: description, check: check, id_user: userId });
             console.log(req.body);
             return res.status(200).json(createMission);
 
@@ -45,12 +41,14 @@ class MissionControler {
         }
     }
     async userGet(req, res) {
-        const userId = req.params.id;
-        const user = await UserModel.findById(userId, '-password')
-        const Mission = await MissionsModel.find()
 
         try {
+            const id  = req.params.id;
+            const Mission = await MissionsModel.find({id_user: id})
+
+            console.log(id);
             console.log(Mission);
+
             return res.status(200).json({ Mission })
         } catch (err) {
             console.log(err);
@@ -72,7 +70,7 @@ class MissionControler {
             }
             return res.status(200).json({ Missions });
         } catch (error) {
-            return res.status(404).json({ msg: 'not sexist this mission' })
+            return res.status(404).json({ msg: 'not exist this mission' })
         }
     }
     async update(req, res) {
@@ -82,6 +80,7 @@ class MissionControler {
             await MissionsModel.findByIdAndUpdate(id, req.body);
             return res.status(200).json({ msg: 'Product updated' })
         } catch (error) {
+            console.log(error)
             return res.status(404).json({ msg: 'Failed to updtate mission' })
         }
     }
